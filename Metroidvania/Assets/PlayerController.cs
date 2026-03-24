@@ -45,6 +45,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Vector2 SideAttackArea, UpAttackArea, DownAttackArea;
     [SerializeField] LayerMask attackableLayer;
     [SerializeField] float damage;
+    [SerializeField] GameObject slashEffect;
+
+    [Header("Vida")]
+    public int health;
+    public int maxHealth;
 
     private void Awake()
     {
@@ -56,6 +61,14 @@ public class PlayerController : MonoBehaviour
         {
             instance = this;
         }
+    }
+    public void TakeDamage(float damage)
+    {
+        health -= Mathf.RoundToInt(damage);
+    }
+    void ClampHealth()
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
     }
 
     void Start()
@@ -104,7 +117,7 @@ public class PlayerController : MonoBehaviour
     void Move()
     {
         rb.linearVelocity = new Vector2(walkSpeed * moveInput.x, rb.linearVelocity.y);
-        animator.SetBool("Walking", rb.linearVelocityX != 0 && IsGrounded());
+        animator.SetBool("Walking", rb.linearVelocity.x != 0 && IsGrounded());
     }
 
     void Flip()
@@ -115,9 +128,17 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(1, 1, 1);
     }
 
+    void SlashEffectAngle(GameObject _effect, int _direction, Transform _attackTransform)
+    {
+        _effect = Instantiate(_effect, _attackTransform);
+        _effect.transform.eulerAngles = new Vector3(0, 0, _direction);
+        _effect.transform.localScale = new Vector2(transform.localScale.x,transform.localScale.y);
+    }
+
 
     void JumpInput()
     {
+        animator.SetBool("Jump", !IsGrounded());
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (remainingJumps > 0 && IsGrounded())
@@ -139,8 +160,6 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
         }
-
-        animator.SetBool("Jump", !IsGrounded());
     }
 
     void CheckGround()
@@ -171,12 +190,17 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("Attacking");
         
-        if(moveInput.y > 0)
+        if(moveInput.y > 0) {
             Hit(UpAttackTransform, UpAttackArea);
-        else if(moveInput.y < 0)
+            Instantiate(slashEffect, UpAttackTransform);
+        }
+        else if(moveInput.y < 0) {
             Hit(DownAttackTransform, DownAttackArea);
+            Instantiate(slashEffect, DownAttackTransform);
+        }
         else
             Hit(SideAttackTransform, SideAttackArea);
+            Instantiate(slashEffect, SideAttackTransform);
     }
 
     private void Hit(Transform _attackTransform, Vector2 _attackArea)

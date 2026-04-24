@@ -205,9 +205,10 @@ public class PlayerController : MonoBehaviour
             Hit(DownAttackTransform, DownAttackArea);
             Instantiate(slashEffect, DownAttackTransform);
         }
-        else
+        else {
             Hit(SideAttackTransform, SideAttackArea);
             Instantiate(slashEffect, SideAttackTransform);
+        }
     }
 
     private void Hit(Transform _attackTransform, Vector2 _attackArea)

@@ -1103,6 +1103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07beea253dc4b1e45826d28fff91228a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  invencible: 0
   walkSpeed: 20
   jumpForce: 32
   jumpCutMultiplier: 0.5
@@ -1121,7 +1122,7 @@ MonoBehaviour:
   SideAttackTransform: {fileID: 704956590}
   UpAttackTransform: {fileID: 484715647}
   DownAttackTransform: {fileID: 1619718791}
-  SideAttackArea: {x: 3, y: 3}
+  SideAttackArea: {x: 2, y: 3}
   UpAttackArea: {x: 3, y: 2}
   DownAttackArea: {x: 3, y: 2}
   attackableLayer:
@@ -1403,7 +1404,7 @@ GameObject:
   - component: {fileID: 1484102165}
   - component: {fileID: 1484102166}
   m_Layer: 7
-  m_Name: Square
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1478,9 +1479,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!212 &1484102163
 SpriteRenderer:
@@ -1568,13 +1569,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ea87ed00527e24c88ca97a07a627f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnTest
-  health: 10
-  recoilLength: 2
+  health: 160
+  recoilLength: 3
   recoilFactor: 10
   isRecoiling: 0
-  player: {fileID: 0}
-  speed: 10
-  damage: 0
+  player: {fileID: 727130732}
+  speed: 5
+  damage: 10
 --- !u!61 &1484102166
 BoxCollider2D:
   m_ObjectHideFlags: 0

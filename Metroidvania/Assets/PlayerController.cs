@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     Animator animator;
     private Rigidbody2D rb;
+    
+    public bool invencible = false;
 
     [Header("Movimento")]
     [SerializeField] private float walkSpeed = 20;
@@ -61,15 +63,31 @@ public class PlayerController : MonoBehaviour
         {
             instance = this;
         }
+        Health = maxHealth;
     }
     public void TakeDamage(float damage)
     {
-        health -= Mathf.RoundToInt(damage);
+        if (!invencible)
+        {
+            Health -= Mathf.RoundToInt(damage);
+            Debug.Log("Player took " + damage + " damage. Current health: " + health);
+            StartCoroutine(StopTakingDamage());
+        }
     }
-    void ClampHealth()
+
+    IEnumerator StopTakingDamage()
     {
-        health = Mathf.Clamp(health, 0, maxHealth);
+        invencible = true;
+        yield return new WaitForSeconds(1f);
+        invencible = false;
     }
+
+    public int Health
+    {
+        get { return health; }
+        set { health = Mathf.Clamp(value, 0, maxHealth); }
+    }
+
 
     void Start()
     {
@@ -106,7 +124,7 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveInput.y = 1;
         if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveInput.y = -1;
         
-        attackInput = Input.GetMouseButton(0);
+        attackInput = Input.GetButtonDown("Attack");
 
         if (moveInput.x != 0)
         {
@@ -212,16 +230,19 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Hit(Transform _attackTransform, Vector2 _attackArea)
-    {
-        Collider2D[] hitEnemies = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-        foreach(Collider2D enemy in hitEnemies)
         {
-            if(enemy.GetComponent<Enemy>() != null)
+            Collider2D[] hitEnemies = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);         
+            List<Enemy> alreadyHitEnemies = new List<Enemy>();
+            foreach(Collider2D collider in hitEnemies)
             {
-                enemy.GetComponent<Enemy>().EnemyHit(damage);
+                Enemy enemyComponent = collider.GetComponent<Enemy>();
+                if(enemyComponent != null && !alreadyHitEnemies.Contains(enemyComponent))
+                {
+                    enemyComponent.EnemyHit(damage);
+                    alreadyHitEnemies.Add(enemyComponent);
+                }
             }
         }
-    }
 
     void DashInput()
     {

@@ -12,6 +12,8 @@ public class Enemy : MonoBehaviour
     protected float recoilTimer;
     [SerializeField] protected float damage;
     protected Rigidbody2D rb;
+    
+    
     void Start()
     {
         
@@ -43,10 +45,16 @@ public class Enemy : MonoBehaviour
     public virtual void EnemyHit(float _damageDone)
     {
         health -= _damageDone;
+        if(!isRecoiling)
+        {
+            Vector2 recoilDirection = (transform.position - player.transform.position).normalized;
+            rb.AddForce(recoilDirection * recoilFactor, ForceMode2D.Impulse);
+            isRecoiling = true;
+        }
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player") && !isRecoiling)
+        if(collision.gameObject.CompareTag("Player") && !PlayerController.instance.invencible && !isRecoiling)
         {
             Attack();
         }

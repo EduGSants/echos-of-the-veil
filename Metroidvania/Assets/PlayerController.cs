@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using Unity.VisualScripting;
 public class PlayerController : MonoBehaviour
 {
     private Vector2 moveInput;
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour
 
     public static PlayerController instance;
 
-    [Header("Ataque (Espada)")]
+    [Header("Ataque")]
     bool attackInput = false;
     [SerializeField] private float attackCooldown = 0.5f;
     private float currentAttackTimer = 0f;
@@ -52,6 +54,9 @@ public class PlayerController : MonoBehaviour
     [Header("Vida")]
     public int health;
     public int maxHealth;
+    [SerializeField] GameObject bloodSpurt;
+    [SerializeField] float hitFlashSpeed;
+    private SpriteRenderer sr;
 
     private void Awake()
     {
@@ -75,9 +80,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     IEnumerator StopTakingDamage()
     {
         invencible = true;
+        GameObject _bloodSpurtParticles = Instantiate(bloodSpurt, transform.position, Quaternion.identity);
+        Destroy(_bloodSpurtParticles, 1.5f);
         yield return new WaitForSeconds(1f);
         invencible = false;
     }
@@ -94,6 +102,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         remainingJumps = maxJumps;
         animator = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -114,6 +123,12 @@ public class PlayerController : MonoBehaviour
         DashInput();
         Flip();
         HandleAttack();
+        FlashWhileInvincible();
+    }
+
+    void FlashWhileInvincible()
+    {
+        sr.material.color = invencible ? Color.Lerp(Color.white, Color.black, Mathf.PingPong(Time.time * hitFlashSpeed, 1f)) : Color.white;
     }
 
     void GetInputs()
